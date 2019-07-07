@@ -34,8 +34,10 @@ def get_jwt_identity():
     In a protected endpoint, this will return the identity of the JWT that is
     accessing this endpoint. If no JWT is present,`None` is returned instead.
     """
-    return get_raw_jwt().get(config.identity_claim_key, None)
-
+    if config.identity_claim_key:
+        return get_raw_jwt().get(config.identity_claim_key, None)
+    else:
+        return get_raw_jwt()
 
 def get_jwt_claims():
     """
@@ -43,8 +45,10 @@ def get_jwt_claims():
     in the JWT that is accessing the endpoint. If no custom user claims are
     present, an empty dict is returned instead.
     """
-    return get_raw_jwt().get(config.user_claims_key, {})
-
+    if config.user_claims_key:
+        return get_raw_jwt().get(config.user_claims_key, {})
+    else:
+        return get_raw_jwt().
 
 def get_current_user():
     """

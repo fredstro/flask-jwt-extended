@@ -31,7 +31,10 @@ def verify_jwt_in_request():
         jwt_data = _decode_jwt_from_request(request_type='access')
         ctx_stack.top.jwt = jwt_data
         verify_token_claims(jwt_data)
-        _load_user(jwt_data[config.identity_claim_key])
+        if config.identity_claim_key:
+            _load_user(jwt_data[config.identity_claim_key])
+        else:
+            _load_user(jwt_data)
 
 
 def verify_jwt_in_request_optional():
@@ -50,7 +53,10 @@ def verify_jwt_in_request_optional():
             jwt_data = _decode_jwt_from_request(request_type='access')
             ctx_stack.top.jwt = jwt_data
             verify_token_claims(jwt_data)
-            _load_user(jwt_data[config.identity_claim_key])
+            if config.identity_claim_key:
+                _load_user(jwt_data[config.identity_claim_key])
+            else:
+                _load_user(jwt_data)
     except (NoAuthorizationError, InvalidHeaderError):
         pass
 
@@ -73,7 +79,10 @@ def verify_fresh_jwt_in_request():
             if fresh < now:
                 raise FreshTokenRequired('Fresh token required')
         verify_token_claims(jwt_data)
-        _load_user(jwt_data[config.identity_claim_key])
+        if config.identity_claim_key:
+            _load_user(jwt_data[config.identity_claim_key])
+        else:
+            _load_user(jwt_data)
 
 
 def verify_jwt_refresh_token_in_request():
@@ -84,8 +93,10 @@ def verify_jwt_refresh_token_in_request():
     if request.method not in config.exempt_methods:
         jwt_data = _decode_jwt_from_request(request_type='refresh')
         ctx_stack.top.jwt = jwt_data
-        _load_user(jwt_data[config.identity_claim_key])
-
+        if config.identity_claim_key:
+            _load_user(jwt_data[config.identity_claim_key])
+        else:
+            _load_user(jwt_data)
 
 def jwt_required(fn):
     """

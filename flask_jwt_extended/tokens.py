@@ -60,12 +60,14 @@ def encode_access_token(identity, secret, algorithm, expires_delta, fresh,
     if isinstance(fresh, datetime.timedelta):
         now = datetime.datetime.utcnow()
         fresh = timegm((now + fresh).utctimetuple())
-
     token_data = {
-        identity_claim_key: identity,
         'fresh': fresh,
-        'type': 'access',
+        'type' : 'access',
     }
+    if identity_claim_key:
+        token_data[identity_claim_key] = identity
+    else: # If no identity claim key is given we add the payload directly in the token
+        token_data.update(identity)
 
     # Don't add extra data to the token if user_claims is empty.
     if user_claims:
@@ -98,9 +100,12 @@ def encode_refresh_token(identity, secret, algorithm, expires_delta, user_claims
     :return: Encoded refresh token
     """
     token_data = {
-        identity_claim_key: identity,
         'type': 'refresh',
     }
+    if identity_claim_key:
+        token_data[identity_claim_key] = identity
+    else: # If no identity claim key is given we add the payload directly in the token
+        token_data.update(identity)
 
     # Don't add extra data to the token if user_claims is empty.
     if user_claims:
@@ -140,7 +145,7 @@ def decode_jwt(encoded_token, secret, algorithms, identity_claim_key,
     # Make sure that any custom claims we expect in the token are present
     if 'jti' not in data:
         data['jti'] = None
-    if identity_claim_key not in data:
+    if identity_claim_key and identity_claim_key not in data:
         raise JWTDecodeError("Missing claim: {}".format(identity_claim_key))
     if 'type' not in data:
         data['type'] = 'access'
