@@ -48,7 +48,7 @@ def get_jwt_claims():
     if config.user_claims_key:
         return get_raw_jwt().get(config.user_claims_key, {})
     else:
-        return get_raw_jwt().
+        return get_raw_jwt()
 
 def get_current_user():
     """
